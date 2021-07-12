@@ -22,8 +22,6 @@ firebase_admin.initialize_app(cred, {
 ref = db.reference()
 
 
-
-
 # detector de faces
 detector = MTCNN()
 
