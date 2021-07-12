@@ -4,6 +4,7 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 ## Requisitos
 * [Python 3.6.0 - Para uso com o TF](https://www.python.org/downloads/release/python-360/)
 * [Python 3.7.0 - Para uso com o TFLITE](https://www.python.org/downloads/release/python-370/)
+* [FaceDetection - Tflite 0.3.0] (https://pypi.org/project/face-detection-tflite/)
 * [tensorflow](tensorflow.org)
 * [MTCNN](https://github.com/ipazc/mtcnn)
 * [Numpy](https://numpy.org/install/)
