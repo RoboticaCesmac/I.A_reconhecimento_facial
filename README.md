@@ -16,7 +16,7 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 
 ### Os códigos do TFLITE exigem o python 3.7 ou superior!
 
-### O que tem de novo nesse commit:
+### O que mudou desde o ultimo commit:
 * Testes com bibliotecas trocadas para uso com o TensorflowLite (apenas a detecção está funcionando no arquivo TfLite.py)
 
 ### Para alternar entre as versões do python é preciso trocar a versão nas variáveis path!
