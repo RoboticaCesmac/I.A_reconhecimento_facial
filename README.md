@@ -12,6 +12,8 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 * [Sklearn](https://scikit-learn.org/stable/install.html)
 * [Firebase](https://firebase.google.com/docs/admin/setup)
 
+
+
 ### Os códigos do TFLITE exigem o python 3.7 ou superior!
 
 ### O que tem de novo nesse commit:
