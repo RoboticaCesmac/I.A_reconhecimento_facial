@@ -3,8 +3,7 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 
 ## Requisitos
 * [Python 3.6.0 - Para uso com o TF](https://www.python.org/downloads/release/python-360/)
-* [Python 3.7.0 - Para uso com o TFLITE](https://www.python.org/downloads/release/python-370/)
-* [FaceDetection - Tflite 0.3.0](https://pypi.org/project/face-detection-tflite/)
+* [mtcnn-tflite 0.0.4 - Para uso com TFLITE](https://pypi.org/project/mtcnn-tflite/)
 * [tensorflow](tensorflow.org)
 * [MTCNN](https://github.com/ipazc/mtcnn)
 * [Numpy](https://numpy.org/install/)
@@ -14,10 +13,14 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 * [Firebase](https://firebase.google.com/docs/admin/setup)
 
 
+## Para executar os códigos que ainda estão em teste (Testes.py):
+### Os códigos de teste exigem o python 3.7 ou superior!
+* [Python 3.7.0 - Para executar os códigos de teste (Testes.py)](https://www.python.org/downloads/release/python-370/)
+* [FaceDetection_Tflite 0.3.0 - Para Para executar os códigos de teste (Testes.py)](https://pypi.org/project/face-detection-tflite/)
 
-### Os códigos do TFLITE exigem o python 3.7 ou superior!
 
 ### O que mudou desde o ultimo commit:
-* Testes com bibliotecas trocadas para uso com o TensorflowLite (apenas a detecção está funcionando no arquivo TfLite.py)
+* Utilização do MTCNN adaptado para o Tensorflow Lite
+
 
 ### Para alternar entre as versões do python é preciso trocar a versão nas variáveis path!
