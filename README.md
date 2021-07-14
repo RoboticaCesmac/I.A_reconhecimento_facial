@@ -20,7 +20,7 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 
 
 ### O que mudou desde o ultimo commit:
-* Utilização do MTCNN adaptado para o Tensorflow Lite
+* Sucesso na execução do sistema apenas com o TensorflowLite
 
 
 ### Para alternar entre as versões do python é preciso trocar a versão nas variáveis path!
