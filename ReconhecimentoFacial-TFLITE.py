@@ -3,7 +3,9 @@
 import numpy as np
 from PIL import Image
 from mtcnn_tflite.MTCNN import MTCNN
+#from mtcnn.mtcnn import MTCNN
 from tensorflow.keras.models import load_model
+import tensorflow as tf
 import cv2
 from sklearn.preprocessing import Normalizer
 import firebase_admin
@@ -26,13 +28,23 @@ ref = db.reference()
 detector = MTCNN()
 
 # extrator de embeddings
-facenet = load_model("facenet_keras.h5")
+interpreterFacenet = tf.lite.Interpreter(model_path="facenet_keras.tflite")
+input_detailsFacenet = interpreterFacenet.get_input_details()
+output_detailsFacenet = interpreterFacenet.get_output_details()
+interpreterFacenet.allocate_tensors()
 
 # modelo de reconhecimento de faces
-model = load_model("faces.h5")
+interpreterFaces = tf.lite.Interpreter(model_path="faces.tflite")
+input_detailsFaces = interpreterFaces.get_input_details()
+output_detailsFaces = interpreterFaces.get_output_details()
+interpreterFaces.allocate_tensors()
 
-# detector de máscara
-modelMask = load_model("detector_mascara.h5")
+# detector de máscaras
+interpreterMask = tf.lite.Interpreter(model_path="detector_mascara.tflite")
+input_detailsMask = interpreterMask.get_input_details()
+output_detailsMask = interpreterMask.get_output_details()
+interpreterMask.allocate_tensors()
+
 
 # classes da rede (nome das pessoas)
 pessoa = [
@@ -89,7 +101,7 @@ def extract_face(image, box,  required_size=(160, 160)):
 
 
 # Função para extrair embeddings (dados faciais)
-def get_embeddig(facenet, face_pixels):
+def get_embeddig(face_pixels):
 
     # normalização
     face_pixels = face_pixels.astype("float32")
@@ -103,8 +115,14 @@ def get_embeddig(facenet, face_pixels):
     # expnsão dee dimensões para matriz
     samples = np.expand_dims(face_pixels, axis=0)
 
-    # predict para extrair embedding
-    yhat = facenet.predict(samples)
+    
+    samples2 = samples.astype(np.float32)
+                  
+    interpreterFacenet.set_tensor(input_detailsFacenet[0]['index'], samples2)
+       
+    interpreterFacenet.invoke()
+
+    yhat = interpreterFacenet.get_tensor(output_detailsFacenet[0]['index'])
 
     # retorna embedding
     return yhat[0]
@@ -177,10 +195,18 @@ while True:
 
                 if np.sum([roi]) != 0:
                     # normalização
+                    
                     roi = (roi.astype('float')/255.0)
+                   
+                    roi2 = roi.astype(np.float32)
+                  
 
-                    # verifica se está usando máscara
-                    result = modelMask.predict([[roi]])
+
+                    interpreterMask.set_tensor(input_detailsMask[0]['index'], roi2)
+       
+                    interpreterMask.invoke()
+
+                    result = interpreterMask.get_tensor(output_detailsMask[0]['index'])
 
                     # extrai o resultado
                     result = result[0]
@@ -192,7 +218,7 @@ while True:
                         face = face.astype("float32")/255
 
                         # extrai embedding
-                        embedding = get_embeddig(facenet, face)
+                        embedding = get_embeddig(face)
 
                         # transforma em uma matriz (tensor)
                         tensor = np.expand_dims(embedding, axis=0)
@@ -203,15 +229,18 @@ while True:
                         # executa normalização
                         tensor = norm.transform(tensor)
 
+
                         # prediz qual é a face detectada
-                        classe = model.predict_classes(tensor)[0]
-                        print(classe)
+                        tensor2 = tensor.astype(np.float32)
+                        interpreterFaces.set_tensor(input_detailsFaces[0]['index'], tensor2)
+                        interpreterFaces.invoke()
+                        result = interpreterFaces.get_tensor(output_detailsFaces[0]['index'])
+                
+                        # recupera a probabilidade
+                        prob = np.max(result)*100
 
-                        # probabilidade de ser a face detectada
-                        prob = model.predict_proba(tensor)
-
-                        # probabilidade em porcentagem
-                        prob = prob[0][classe] * 100
+                        # recupera a classe
+                        classe  = np.argmax(result)
 
                         # alta probabilidade para reconhecimento facial
                         if prob >= 98:
