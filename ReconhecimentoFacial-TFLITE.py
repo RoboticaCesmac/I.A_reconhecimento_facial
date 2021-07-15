@@ -4,16 +4,14 @@ import numpy as np
 from PIL import Image
 from mtcnn_tflite.MTCNN import MTCNN
 #from mtcnn.mtcnn import MTCNN
-from tensorflow.keras.models import load_model
-import tensorflow as tf
+from tensorflow import lite
 import cv2
 from sklearn.preprocessing import Normalizer
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
+
 
 #credenciais firebase
-cred = credentials.Certificate("firebase.json")
+cred = firebase_admin.credentials.Certificate("firebase.json")
 
 #inicializa firebase
 firebase_admin.initialize_app(cred, {
@@ -21,26 +19,26 @@ firebase_admin.initialize_app(cred, {
 })
 
 #referência database
-ref = db.reference()
+ref = firebase_admin.db.reference()
 
 
 # detector de faces
 detector = MTCNN()
 
 # extrator de embeddings
-interpreterFacenet = tf.lite.Interpreter(model_path="facenet_keras.tflite")
+interpreterFacenet = lite.Interpreter(model_path="facenet_keras.tflite")
 input_detailsFacenet = interpreterFacenet.get_input_details()
 output_detailsFacenet = interpreterFacenet.get_output_details()
 interpreterFacenet.allocate_tensors()
 
 # modelo de reconhecimento de faces
-interpreterFaces = tf.lite.Interpreter(model_path="faces.tflite")
+interpreterFaces = lite.Interpreter(model_path="faces.tflite")
 input_detailsFaces = interpreterFaces.get_input_details()
 output_detailsFaces = interpreterFaces.get_output_details()
 interpreterFaces.allocate_tensors()
 
 # detector de máscaras
-interpreterMask = tf.lite.Interpreter(model_path="detector_mascara.tflite")
+interpreterMask = lite.Interpreter(model_path="detector_mascara.tflite")
 input_detailsMask = interpreterMask.get_input_details()
 output_detailsMask = interpreterMask.get_output_details()
 interpreterMask.allocate_tensors()
@@ -65,8 +63,6 @@ num_classes = len(pessoa)
 cam = cv2.VideoCapture(0)
 
 # função extrair face
-
-
 def extract_face(image, box,  required_size=(160, 160)):
     # coordenadas x, y, largura e altura
     x, y, w, h = box
@@ -115,33 +111,16 @@ def get_embeddig(face_pixels):
     # expnsão dee dimensões para matriz
     samples = np.expand_dims(face_pixels, axis=0)
 
-    
-    samples2 = samples.astype(np.float32)
-                  
+    # Extração da embedding
+    samples2 = samples.astype(np.float32)       
     interpreterFacenet.set_tensor(input_detailsFacenet[0]['index'], samples2)
-       
     interpreterFacenet.invoke()
-
     yhat = interpreterFacenet.get_tensor(output_detailsFacenet[0]['index'])
 
     # retorna embedding
     return yhat[0]
 
 
-# #configurações para uso sem webcam
-# def rescale(im, ratio):
-#     size = [int(x*ratio) for x in im.size]
-#     im = im.resize(size, Image.ANTIALIAS)
-#     return im
-
-# frame_width = int(cam.get(3))
-# frame_height = int(cam.get(4))
-
-# size = (frame_width, frame_height)
-# video = cv2.VideoWriter('filename.avi',
-#                          cv2.VideoWriter_fourcc(*'MJPG'),
-#                          60, size)
-# #
 
 # loop infinito
 while True:
@@ -152,6 +131,7 @@ while True:
     # detectar faces na imagem
     faces = detector.detect_faces(frame)
 
+    # caso não tenha faces
     if(len(faces) == 0):
         ref.set({
             'face': "nada",
@@ -201,11 +181,9 @@ while True:
                     roi2 = roi.astype(np.float32)
                   
 
-
+                    # verifica se está usando máscara
                     interpreterMask.set_tensor(input_detailsMask[0]['index'], roi2)
-       
                     interpreterMask.invoke()
-
                     result = interpreterMask.get_tensor(output_detailsMask[0]['index'])
 
                     # extrai o resultado
@@ -292,9 +270,6 @@ while True:
                             cv2.putText(frame, user, label_position,
                                         cv2.FONT_HERSHEY_DUPLEX, .6, color, 2)
 
-    # #salva frames em um vídeo
-    # video.write(frame)
-
     # exibe a imagem
     cv2.imshow("RECONHECIMENTO FACIAL", frame)
 
@@ -304,10 +279,11 @@ while True:
     # para o sistema qando pressiona "q"
     if key == ord('q'):
         break
+    if key == ord('Q'):
+        break
 
 # libera a camera ou vídeo
 cam.release()
-# video.release()
 
 # destrói as janelas do opencv
 cv2.destroyAllWindows()

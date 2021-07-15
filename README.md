@@ -20,7 +20,9 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 
 
 ### O que mudou desde o ultimo commit:
-* Sucesso na execução do sistema apenas com o TensorflowLite
+* Ajuste nos códigos e correções de erros.
 
 
 ### Para alternar entre as versões do python é preciso trocar a versão nas variáveis path!
+
+# "converter.py" permite converter um modelo comum do tensorflow para um modelo do tensorflow lite (.he para .tflite).
