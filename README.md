@@ -25,4 +25,4 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 
 ### Para alternar entre as versões do python é preciso trocar a versão nas variáveis path!
 
-# "converter.py" permite converter um modelo comum do tensorflow para um modelo do tensorflow lite (.he para .tflite).
+### "converter.py" permite converter um modelo comum do tensorflow para um modelo do tensorflow lite (.he para .tflite).
