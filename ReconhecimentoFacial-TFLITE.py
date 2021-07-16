@@ -7,6 +7,9 @@ from mtcnn_tflite.MTCNN import MTCNN
 from tensorflow import lite
 import cv2
 from sklearn.preprocessing import Normalizer
+import time
+from firebase_admin import credentials
+from firebase_admin import db
 import firebase_admin
 
 
@@ -19,7 +22,7 @@ firebase_admin.initialize_app(cred, {
 })
 
 #referência database
-ref = firebase_admin.db.reference()
+ref = db.reference()
 
 
 # detector de faces
@@ -61,6 +64,14 @@ num_classes = len(pessoa)
 
 # captura de imagem (parâmetros: "nomeVídeo.mp4" ou 0 para webcam)
 cam = cv2.VideoCapture(0)
+
+#Contador do fps
+start_time = time.time()
+# FPS update time in seconds
+display_time = 2
+fc = 0
+FPS = 0
+
 
 # função extrair face
 def extract_face(image, box,  required_size=(160, 160)):
@@ -127,6 +138,23 @@ while True:
 
     # ler imagem
     ret, frame = cam.read()
+
+
+
+    #contador do fps
+    fc+=1
+    TIME = time.time() - start_time
+    if (TIME) >= display_time :
+	    FPS = fc / (TIME)
+	    fc = 0
+	    start_time = time.time()
+    fps_disp = "FPS: "+str(FPS)[:5]
+    # Add FPS count on frame
+    frame = cv2.putText(frame, fps_disp, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
+
+
+
 
     # detectar faces na imagem
     faces = detector.detect_faces(frame)

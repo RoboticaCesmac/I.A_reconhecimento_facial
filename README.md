@@ -20,7 +20,7 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 
 
 ### O que mudou desde o ultimo commit:
-* Ajuste nos códigos e correções de erros.
+* Implementado o contador de frames por segundo (FPS).
 
 
 ### Para alternar entre as versões do python é preciso trocar a versão nas variáveis path!
