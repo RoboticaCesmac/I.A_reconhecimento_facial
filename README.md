@@ -20,7 +20,7 @@ Projeto de reconhecimento facial para liberar a porta do Centro de Inovação
 
 
 ### O que mudou desde o ultimo commit:
-* Implementação da interface TkInter.
+* A interface foi ativada para o código ReconhecimentoFacial.py.
 
 
 ### Para alternar entre as versões do python é preciso trocar a versão nas variáveis path!

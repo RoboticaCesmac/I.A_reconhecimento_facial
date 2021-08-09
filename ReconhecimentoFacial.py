@@ -1,7 +1,6 @@
 # É NECESSÁRIO UTILIZAR O PYTHON 3.6.0 NESSE CÓDIGO
 
 import numpy as np
-from PIL import Image
 from mtcnn.mtcnn import MTCNN
 from tensorflow.keras.models import load_model
 import cv2
@@ -10,16 +9,29 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 import time
+import sys
+from tkinter import *
+from PIL import Image, ImageTk
 
-#credenciais firebase
+
+def sair():
+    sys.exit()
+
+
+janela = Tk()
+janela.attributes("-fullscreen", True)
+
+janela.title("Teste TK")
+
+# credenciais firebase
 cred = credentials.Certificate("firebase.json")
 
-#inicializa firebase
+# inicializa firebase
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://reconhecimento-facial-aa406-default-rtdb.firebaseio.com/'
 })
 
-#referência database
+# referência database
 ref = db.reference()
 
 
@@ -52,14 +64,6 @@ num_classes = len(pessoa)
 
 # captura de imagem (parâmetros: "nomeVídeo.mp4" ou 0 para webcam)
 cam = cv2.VideoCapture(0)
-
-
-#Contador do fps
-start_time = time.time()
-# FPS update time in seconds
-display_time = 2
-fc = 0
-FPS = 0
 
 
 # função extrair face
@@ -135,31 +139,14 @@ def get_embeddig(facenet, face_pixels):
 #                          60, size)
 # #
 
-# loop infinito
-while True:
+
+def task():
+    
+    # loop infinito
+
 
     # ler imagem
     ret, frame = cam.read()
-
-
-
-
-
-    #contador do fps
-    fc+=1
-    TIME = time.time() - start_time
-    if (TIME) >= display_time :
-	    FPS = fc / (TIME)
-	    fc = 0
-	    start_time = time.time()
-    fps_disp = "FPS: "+str(FPS)[:5]
-    # Add FPS count on frame
-    frame = cv2.putText(frame, fps_disp, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-
-
-
-
-
 
     # detectar faces na imagem
     faces = detector.detect_faces(frame)
@@ -297,18 +284,26 @@ while True:
     # video.write(frame)
 
     # exibe a imagem
-    cv2.imshow("RECONHECIMENTO FACIAL", frame)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = Image.fromarray(frame)
 
-    # aguarda alguma tecla
-    key = cv2.waitKey(1)
+    print("printe")
+    
+    tkimage = ImageTk.PhotoImage(frame)
+    imagem["text"] = janela
+    imagem["image"] = tkimage
+    imagem.image = tkimage
+    janela.after(1, task)
+        
 
-    # para o sistema qando pressiona "q"
-    if key == ord('q'):
-        break
-
+bt = Button(janela, width=20, text="Fechar", command=sair)
+bt.pack(side=BOTTOM, padx=20, pady=20)
+tkimage = ImageTk.PhotoImage(Image.open("loading.png"))
+imagem = Label( janela, image = tkimage)
+imagem.image = tkimage
+imagem.pack(padx=20, pady=20)
+janela.after(1000, task)
+janela.mainloop()
 # libera a camera ou vídeo
 cam.release()
 # video.release()
-
-# destrói as janelas do opencv
-cv2.destroyAllWindows()
