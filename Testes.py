@@ -1,39 +1,27 @@
 # É NECESSÁRIO UTILIZAR O PYTHON 3.7.0 NESSE CÓDIGO
 
-from fdlite import FaceDetection
-from fdlite.render import Colors, detections_to_render_data, render_to_image
-from PIL import Image
 import numpy as np
 import cv2
+from tkinter import *
+from PIL import Image, ImageTk
 
 
 cam = cv2.VideoCapture(0)
 
-
-detect_faces = FaceDetection()
 # loop infinito
 while True:
 
     # ler imagem
     ret, frame = cam.read()
-    opencv_image = frame
-    color_coverted = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    pil_image=Image.fromarray(color_coverted)
-    
-    faces = detect_faces(pil_image)
-
-
-    if len(faces) == 0:
-        print('no faces detected :(')
-    else:
-        render_data = detections_to_render_data(faces, bounds_color=Colors.GREEN)
-        img = render_to_image(render_data, pil_image)
-        numpy_image = np.array(img)  
-        opencv_image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR) 
+    dim = (1000, 600)
+    imagem_dimensionada= cv2.resize(frame, dim, interpolation = cv2.INTER_AREA) 
+    imagem_swp = cv2.cvtColor(imagem_dimensionada, cv2.COLOR_BGR2RGB)
+    imagem_pil = Image.fromarray(imagem_swp)
+    imagem_tk = ImageTk.PhotoImage(imagem_pil)
 
 
     # exibe a imagem
-    cv2.imshow("RECONHECIMENTO FACIAL", opencv_image)
+    cv2.imshow("RECONHECIMENTO FACIAL", frame)
 
     # aguarda alguma tecla
     key = cv2.waitKey(1)
